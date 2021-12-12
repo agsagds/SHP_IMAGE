@@ -1,3 +1,5 @@
+#ifndef IMAGE_H
+#define IMAGE_H
 #include "Pixel.h"
 #include "lodepng.h"
 #include <iostream>
@@ -11,67 +13,98 @@ class Image{
 public:
 	unsigned int width, height;
 	vector <Pixel> pixels;
-
-	Image(): width(0), height(0){}
-	Image(int width, int height, vector <Pixel> pixels): width(width), height(height), pixels(pixels){}
-	Image(int width, int height)
-	{
-		throw std::exception("not implemented");//todo: sdelat
-	}
-	Image(const Image& img): width(img.width), height(img.height), pixels(img.pixels){}
-
-	Image(string filename)
-	{
-		const char* filein = filename.c_str();
-		vector <uchar> image;
-		unsigned width, height, w=0, h=0;
-		lodepng::decode(image, width, height, filein);
-		for(unsigned long long i=0; i<width*height*4; i+=4, w++)
-		{
-			Color color(image[i], image[i+1], image[i+2], image[i+3]);
-			Point point(w/width, w%width+1);
-			Pixel pixel(color, point);
-			pixels.push_back(pixel);
-		}
-	}
-
-	void setPixel(Pixel pixel, unsigned x){
-		pixels[x]=pixel;
-	}
+    
+    /*Default constructor*/
+	Image();
+    
+    /*Constructor
+        width - width of image
+        height - height of image
+        pixels - vector of pixels for image. Must contains width*height pixels
+        
+        Construct Image instance from pixels
+    */
+	Image(int width, int height, vector <Pixel> pixels);
 	
-	void setPixel(Color c, unsigned x, unsigned y){
-		pixels[y*width+x].setColor(c);
-	}
-	
-	void setPixel(Pixel pixel){
-		pixels[pixel.getY()*width+pixel.getX()]=pixel;
-	}
-
-	
-	Pixel getPixel(unsigned x){
-		return pixels[x];
-	}
-
-	Pixel getPixel(unsigned x, unsigned y){
-		return pixels[y*width+x];
-	}
-
-	vector <Pixel> getPixels(){
-		return pixels;
-	}
-
-
-	void outputImage(string filename)
-	{
-		vector <uchar> image;
-		unsigned width = pixels[pixels.size()-1].getY(), height=pixels[pixels.size()-1].getX();
-		for(unsigned long long i=0; i<pixels.size(); i++)
-		{
-			image.push_back(pixels[i].getColor().R);
-			image.push_back(pixels[i].getColor().G);
-			image.push_back(pixels[i].getColor().B);
-			image.push_back(pixels[i].getColor().A);
-		}
-		lodepng::encode(filename.c_str(), image, width, height);
-	}	
+    /*Constructor
+        width - width of image
+        height - height of image
+        
+        Construct Image instance from width and height with white pixels
+    */
+    Image(int width, int height);
+    
+    /*Constructor
+        img - Image instance
+       
+        Construct Image instance from another
+    */
+	Image(const Image& img);
+    
+    /*Constructor
+        filename - path to image
+       
+        Construct Image instance from .png image file
+    */
+	Image(string filename);
+    
+    /*setPixel(Pixel pixel, unsigned x);
+        pixel - pixel for set
+        x - pos of pixel in flat array of pixels
+        
+        Set pixel in pos x to pixel value
+    */
+	void setPixel(Pixel pixel, unsigned x);
+    
+    /*setPixel(Color c, unsigned x, unsigned y);
+        c - color 
+        x - X pos of pixel in image
+        y - Y pos of pixel in image
+        
+        Set color of pixel in pos (x,y) to c
+    */
+	void setPixel(Color c, unsigned x, unsigned y);
+    
+    /*setPixel(Pixel pixel);
+        pixel - new val for pixel
+        
+        Set new val of pixel to pos of pixel
+    */
+	void setPixel(Pixel pixel);
+    
+    /*Pixel getPixel(unsigned x);
+        x - pos of pixel in flat array of pixels 
+        
+        return copy of pixel from image in pos x
+        
+        Returned value: pixel from pos x
+    */
+	Pixel getPixel(unsigned x);
+    
+    /*Pixel getPixel(unsigned x, unsigned y);
+        x - X pos of pixel in image
+        y - Y pos of pixel in image
+        
+        return copy of pixel from image point (x,y)
+        
+        Returned value: pixel from point (x,y)
+    */
+	Pixel getPixel(unsigned x, unsigned y);
+    
+    /*vector <Pixel> getPixels();
+        
+        return copy of pixels from image
+        
+        Returned value: flat array of image pixels
+    */
+	vector <Pixel> getPixels();
+    
+    /*outputImage(string filename);
+        
+        filename - path to image
+        
+        save image into disk to path
+    */
+	void outputImage(string filename);
 };
+#endif
